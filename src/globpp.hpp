@@ -1,3 +1,6 @@
+#ifndef GLOBPP_H_INCLUDED
+#define GLOBPP_H_INCLUDED
+
 #include <cassert>
 #include <string>
 #include <vector>
@@ -44,84 +47,85 @@ namespace globpp {
 }
 
 #else
+
 #include <dirent.h>
 #include <fnmatch.h>
-
-static std::pair<std::string, std::string> SplitPath(const std::string& path) {
-    std::string::size_type last_sep = path.find_last_of("/");
-    if (last_sep != std::string::npos) {
-        return std::make_pair(std::string(path.begin(), path.begin() + last_sep),
-                              std::string(path.begin() + last_sep + 1, path.end()));
-    }
-    return std::make_pair(".", path);
-}
 
 namespace globpp {
 
     class Glob {
     private:
-        std::string dir_name_;
-        std::string pattern_;
-        DIR* dir_;
-        struct dirent* dir_entry_;
+        std::string _dir_name;
+        std::string _pattern;
+        bool _recursive = false;
+        DIR* _dir;
+        struct dirent* _dir_entry;
 
     public:
         Glob(const std::string& pattern)
-          : dir_(0)
-          , dir_entry_(0) {
-            std::pair<std::string, std::string> dir_and_mask = SplitPath(pattern);
-            this->dir_name_ = dir_and_mask.first;
-            dir_ = opendir(dir_and_mask.first.c_str());
-            pattern_ = dir_and_mask.second;
+          : _dir(0)
+          , _dir_entry(0) {
+            auto last_sep = pattern.find_last_of("/");
 
-            if (dir_ != 0) {
+            if (last_sep != std::string::npos) {
+                this->_dir_name = std::string(pattern.begin(), pattern.begin() + last_sep);
+                this->_pattern = std::string(pattern.begin() + last_sep + 1, pattern.end());
+            } else {
+                this->_dir_name = ".";
+                this->_pattern = pattern;
+            }
+
+            this->_dir = opendir(this->_dir_name.c_str());
+
+            if (this->_dir != 0) {
                 Next();
             }
         };
 
         ~Glob() {
-            if (dir_ != 0) {
-                closedir(dir_);
+            if (this->_dir != 0) {
+                closedir(this->_dir);
             }
         };
 
-        std::string GetFileName(bool full_name = false) const {
-            assert(dir_entry_ != 0);
-            if (full_name) {
-                return this->dir_name_ + "/" + dir_entry_->d_name;
-            } else {
-                return dir_entry_->d_name;
-            }
+        std::string GetFileName() const {
+            assert(this->_dir_entry != 0);
+            return this->_dir_name + "/" + this->_dir_entry->d_name;
         }
 
         operator bool() const {
-            return dir_entry_ != 0;
+            return this->_dir_entry != 0;
         }
 
         bool Next() {
-            while ((dir_entry_ = readdir(dir_)) != 0) {
-                if (!fnmatch(pattern_.c_str(),
-                             dir_entry_->d_name,
+            while ((this->_dir_entry = readdir(this->_dir)) != 0) {
+                if (!fnmatch(this->_pattern.c_str(),
+                             this->_dir_entry->d_name,
                              FNM_CASEFOLD | FNM_NOESCAPE | FNM_PERIOD)) {
                     return true;
+                }
+                if (this->_recursive && this->_dir_entry->d_type == DT_DIR) {
                 }
             }
             return false;
         };
     };
 }
+
 #endif
 
 namespace globpp {
-    std::vector<std::string> glob(const std::string& pattern, bool full_name = true) {
+    std::vector<std::string> glob(const std::string& pattern) {
         std::vector<std::string> paths;
         Glob g(pattern);
 
         while (g) {
-            paths.push_back(g.GetFileName(full_name));
+            paths.push_back(g.GetFileName());
             g.Next();
         }
 
         return paths;
     };
 }
+
+#endif
