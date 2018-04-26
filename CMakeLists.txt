@@ -12,7 +12,7 @@ file(DOWNLOAD
      https://raw.githubusercontent.com/catchorg/Catch2/master/single_include/catch.hpp
      ${CMAKE_BINARY_DIR}/catch.hpp)
 
-file(GLOB TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp)
+file(GLOB TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 # Make test executable
