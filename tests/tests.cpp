@@ -33,13 +33,13 @@ TEST_CASE("files in sub-directory", "[tests]") {
 
     SECTION("explicit folder") {
         TempFile t1({ "dummy" }, "temp-file.extension");
-        auto result = globpp::glob("./dummy/*.extension");
+        auto result = globpp::glob("." + DIRSEP + "dummy" + DIRSEP + "*.extension");
         REQUIRE(1 == result.size());
         REQUIRE("." + DIRSEP + "dummy" + DIRSEP + "temp-file.extension" == result.at(0));
     }
     SECTION("asterisk for folder does not work") {
         TempFile t1({ "dummy" }, "temp-file.extension");
-        auto result = globpp::glob("./*/*.extension");
+        auto result = globpp::glob("." + DIRSEP + "*" + DIRSEP + "*.extension");
         REQUIRE(0 == result.size());
     }
 }
@@ -47,7 +47,7 @@ TEST_CASE("files in sub-directory", "[tests]") {
 TEST_CASE("recursion", "[!shouldfail][recurision]") {
     SECTION("recursive asterisk works.") {
         TempFile t1({ "dummy" }, "temp-file.extension");
-        auto result = globpp::glob("./**/*.extension");
+        auto result = globpp::glob("." + DIRSEP + "**" + DIRSEP + "*.extension");
         REQUIRE(1 == result.size());
         REQUIRE("." + DIRSEP + "dummy" + DIRSEP + "temp-file.extension" == result.at(0));
     }

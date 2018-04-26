@@ -4,15 +4,21 @@
 #include <fstream>
 #include <stack>
 #include <string>
+#include <vector>
+
+#ifdef _MSC_VER
+
+#include "Windows.h"
+
+const std::string DIRSEP = "\\";
+
+#else
+
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <vector>
-
-#ifdef _WIN32
-const std::string DIRSEP = "\\";
-#else
 const std::string DIRSEP = "/";
+
 #endif
 
 class TempFile {
@@ -26,7 +32,11 @@ public:
         for (auto& folder : folder_names) {
             full_name += folder + DIRSEP;
             this->folders.push(full_name);
+#ifdef _MSC_VER
+            CreateDirectory(full_name.c_str(), NULL);
+#else
             mkdir(full_name.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+#endif
         }
         this->filename = full_name + name;
 
@@ -40,7 +50,11 @@ public:
         std::remove(this->filename.c_str());
         while (!this->folders.empty()) {
             auto& folder = this->folders.top();
+#ifdef _MSC_VER
+            RemoveDirectory(folder.c_str());
+#else
             rmdir(folder.c_str());
+#endif
             this->folders.pop();
         }
     };

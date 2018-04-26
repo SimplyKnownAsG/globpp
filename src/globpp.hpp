@@ -1,131 +1,82 @@
 #ifndef GLOBPP_H_INCLUDED
 #define GLOBPP_H_INCLUDED
 
-#include <cassert>
 #include <string>
 #include <vector>
 
-#ifdef _WIN32
+#ifdef _MSC_VER
+
 #include <windows.h>
-
-namespace globpp {
-
-    class Glob {
-    private:
-        bool _ok;
-        HANDLE _file_handle;
-        WIN32_FIND_DATA _find_data;
-
-    public:
-        Glob(const std::string& pattern);
-
-        ~Glob();
-
-        std::string GetFileName() const;
-
-        operator bool() const;
-
-        bool Next();
-    };
-}
 
 #else
 
 #include <dirent.h>
 #include <fnmatch.h>
 
+#endif
+
 namespace globpp {
+
+    std::vector<std::string> glob(const std::string& pattern);
 
     class Glob {
     private:
-        std::string _dir_name;
         std::string _pattern;
+
+        std::string _dir_name;
 
     public:
         Glob(const std::string& pattern);
 
+        class iterator;
+
+        iterator begin();
+
+        iterator end();
+
         class iterator {
         private:
-            std::string _dir_name;
+            friend class Glob;
+
             std::string _pattern;
-            std::string _current_file;
+
+            std::string _dir_name;
+
+            std::string _file_name;
+
+#ifdef _MSC_VER
+            bool _ok = false;
+
+            HANDLE _file_handle;
+
+            WIN32_FIND_DATA _find_data;
+
+#else
             DIR* _dir;
+
             struct dirent* _dir_entry;
 
+#endif
+            iterator(const std::string& dir_name, const std::string& pattern);
+
+            iterator();
+
         public:
-            iterator(std::string dir_name, std::string pattern);
-
-            iterator()
-                    : _dir_name()
-                    , _pattern()
-                    , _current_file()
-                    , _dir(0)
-                    , _dir_entry(0){};
-
-            iterator(iterator&& that)
-                    : _dir_name(that._dir_name)
-                    , _pattern(that._pattern)
-                    , _current_file(that._current_file) {
-                this->_dir = that._dir;
-                this->_dir_entry = that._dir_entry;
-                that._dir = 0;
-                that._dir_entry = 0;
-            };
+            iterator(iterator&& that);
 
             iterator(const iterator& that) = delete;
 
-            ~iterator() {
-                if (this->_dir != 0) {
-                    closedir(this->_dir);
-                }
-            };
+            ~iterator();
 
-            iterator& operator++() {
-                if (this->_dir == 0) {
-                    this->_current_file = "";
-                    return *this;
-                }
-                while ((this->_dir_entry = readdir(this->_dir)) != 0) {
-                    if (!fnmatch(this->_pattern.c_str(),
-                                 this->_dir_entry->d_name,
-                                 FNM_CASEFOLD | FNM_NOESCAPE | FNM_PERIOD)) {
-                        this->_current_file = this->_dir_name + "/" + this->_dir_entry->d_name;
-                        return *this;
-                    }
-                }
-                this->_current_file = "";
-                closedir(this->_dir);
-                this->_dir = 0;
-                return *this;
-            };
+            iterator& operator++();
 
-            bool operator==(const iterator& that) const {
-                return this->_dir == that._dir && this->_current_file == that._current_file;
-            };
+            bool operator==(const iterator& that) const;
 
-            bool operator!=(const iterator& that) const {
-                return this->_dir != that._dir || this->_current_file != that._current_file;
-            };
+            bool operator!=(const iterator& that) const;
 
-            std::string& operator*() {
-                return this->_current_file;
-            };
-        };
-
-        iterator begin() {
-            return iterator(this->_dir_name, this->_pattern);
-        };
-
-        iterator end() {
-            return iterator();
+            std::string& operator*();
         };
     };
-}
-
-#endif
-
-namespace globpp {
-    std::vector<std::string> glob(const std::string& pattern);
 }
 
 #endif
