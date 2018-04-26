@@ -5,8 +5,8 @@
 namespace globpp {
 
     Glob::Glob(const std::string& pattern)
-      : _ok(false)
-      , _file_handle(INVALID_HANDLE_VALUE) {
+            : _ok(false)
+            , _file_handle(INVALID_HANDLE_VALUE) {
         _file_handle = FindFirstFile(pattern.c_str(), &_find_data);
         _ok = _file_handle != INVALID_HANDLE_VALUE;
     };
@@ -36,9 +36,7 @@ namespace globpp {
 
 namespace globpp {
 
-    Glob::Glob(const std::string& pattern)
-      : _dir(0)
-      , _dir_entry(0) {
+    Glob::Glob(const std::string& pattern) {
         auto last_sep = pattern.find_last_of("/");
 
         if (last_sep != std::string::npos) {
@@ -48,38 +46,15 @@ namespace globpp {
             this->_dir_name = ".";
             this->_pattern = pattern;
         }
+    };
 
+    Glob::iterator::iterator(std::string dir_name, std::string pattern)
+            : _dir_name(dir_name)
+            , _pattern(pattern) {
         this->_dir = opendir(this->_dir_name.c_str());
-
         if (this->_dir != 0) {
-            Next();
+            this->operator++();
         }
-    };
-
-    Glob::~Glob() {
-        if (this->_dir != 0) {
-            closedir(this->_dir);
-        }
-    };
-
-    std::string Glob::GetFileName() const {
-        assert(this->_dir_entry != 0);
-        return this->_dir_name + "/" + this->_dir_entry->d_name;
-    }
-
-    Glob::operator bool() const {
-        return this->_dir_entry != 0;
-    }
-
-    bool Glob::Next() {
-        while ((this->_dir_entry = readdir(this->_dir)) != 0) {
-            if (!fnmatch(this->_pattern.c_str(),
-                         this->_dir_entry->d_name,
-                         FNM_CASEFOLD | FNM_NOESCAPE | FNM_PERIOD)) {
-                return true;
-            }
-        }
-        return false;
     };
 }
 
@@ -90,10 +65,14 @@ namespace globpp {
         std::vector<std::string> paths;
         Glob g(pattern);
 
-        while (g) {
-            paths.push_back(g.GetFileName());
-            g.Next();
+        for (auto& p : g) {
+            paths.push_back(p);
         }
+
+        /* while (g) { */
+        /*     paths.push_back(g.GetFileName()); */
+        /*     g.Next(); */
+        /* } */
 
         return paths;
     };
