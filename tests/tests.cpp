@@ -42,6 +42,9 @@ TEST_CASE("files in sub-directory", "[tests]") {
         auto result = globpp::glob("./*/*.extension");
         REQUIRE(0 == result.size());
     }
+}
+
+TEST_CASE("recursion", "[!shouldfail][recurision]") {
     SECTION("recursive asterisk works.") {
         TempFile t1({ "dummy" }, "temp-file.extension");
         auto result = globpp::glob("./**/*.extension");

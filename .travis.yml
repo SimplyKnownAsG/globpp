@@ -1,0 +1,13 @@
+language: cpp
+
+compiler:
+  - clang++
+  - g++
+
+script:
+  - mkdir build
+  - cd build
+  - cmake -G "Unix Makefiles" ..
+  - make
+  - ./run_tests
+
