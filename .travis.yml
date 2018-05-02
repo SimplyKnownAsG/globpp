@@ -9,5 +9,4 @@ script:
   - cd build
   - cmake -G "Unix Makefiles" ..
   - make
-  - ./run_tests
 

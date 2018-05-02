@@ -23,5 +23,3 @@ build:
   project: $(APPVEYOR_BUILD_FOLDER)\build\globpp_tests.sln
   parallel: true
 
-test_script:
-  - Release\run_tests
