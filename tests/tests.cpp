@@ -1,7 +1,16 @@
 #include "catch.hpp"
 
+#include "Glob.hpp"
 #include "TempFile.hpp"
-#include "globpp.hpp"
+
+#include <iostream>
+
+void print_results(std::vector<std::string> results) {
+    int num = 0;
+    for (auto res : results) {
+        std::cout << num++ << "   " << res << std::endl;
+    }
+}
 
 TEST_CASE("files in current dir", "[tests]") {
 
@@ -37,18 +46,28 @@ TEST_CASE("files in sub-directory", "[tests]") {
         REQUIRE(1 == result.size());
         REQUIRE("." + DIRSEP + "dummy" + DIRSEP + "temp-file.extension" == result.at(0));
     }
-    SECTION("asterisk for folder does not work") {
+    SECTION("asterisk for folder") {
         TempFile t1({ "dummy" }, "temp-file.extension");
         auto result = globpp::glob("." + DIRSEP + "*" + DIRSEP + "*.extension");
-        REQUIRE(0 == result.size());
+        /* print_results(result); */
+        REQUIRE(1 == result.size());
+        REQUIRE("." + DIRSEP + "dummy" + DIRSEP + "temp-file.extension" == result.at(0));
     }
 }
 
-TEST_CASE("recursion", "[!shouldfail][recurision]") {
+TEST_CASE("recursion", "[!mayfail][recursion]") {
     SECTION("recursive asterisk works.") {
         TempFile t1({ "dummy" }, "temp-file.extension");
+        TempFile t2({ "d", "u" }, "temp-file.extension");
+        TempFile t3({ "d", "u", "m" }, "temp-file.extension");
+
+        // trick files!!
+        TempFile t4({ "d", "u" }, "temp-file.ext");
+        TempFile t5({ "d", "u", "m" }, "temp-file.ext");
+
         auto result = globpp::glob("." + DIRSEP + "**" + DIRSEP + "*.extension");
-        REQUIRE(1 == result.size());
+        /* print_results(result); */
+        REQUIRE(3 == result.size());
         REQUIRE("." + DIRSEP + "dummy" + DIRSEP + "temp-file.extension" == result.at(0));
     }
 }
