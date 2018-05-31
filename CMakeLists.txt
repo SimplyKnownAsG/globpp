@@ -4,31 +4,14 @@ cmake_minimum_required(VERSION 3.8)
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
-project(globpp_tests)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src)
+project(globpp)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-file(DOWNLOAD
-        https://github.com/catchorg/Catch2/releases/download/v1.12.2/catch.hpp
-        ${CMAKE_BINARY_DIR}/3rd/catch.hpp)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-include_directories(${CMAKE_BINARY_DIR}/3rd)
+option(GLOBPP_TESTS  "Enable testing" ON)
 
-file(GLOB TEST_SOURCES
-        ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp)
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/tests)
-
-# Make test executable
-add_executable(run_tests ${TEST_SOURCES})
-target_link_libraries(run_tests globpp)
-target_compile_features(run_tests PRIVATE cxx_range_for cxx_auto_type)
-
-
-# the ctest thing is far too complicated...
-add_custom_command(
-        TARGET run_tests
-        POST_BUILD
-        COMMAND $<TARGET_FILE:run_tests>)
-
+if(GLOBPP_TESTS)
+        add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests)
+endif()
