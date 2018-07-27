@@ -1,5 +1,5 @@
-#include "Iterator.hpp"
-#include "Search.hpp"
+#include "globpp/Iterator.hpp"
+#include "globpp/Search.hpp"
 
 #include <iostream>
 #include <sstream>

@@ -1,18 +1,9 @@
-#include "Search.hpp"
+#include "globpp/Search.hpp"
+#include "globpp/globpp.hpp"
 
 #include <sstream>
 
 namespace globpp {
-
-#ifdef _MSC_VER
-
-    static const char* DIR_SEP = "\\";
-
-#else
-
-    static const char* DIR_SEP = "/";
-
-#endif
 
 #ifdef _MSC_VER
     Search::Search(std::string dir_name, std::string pattern)

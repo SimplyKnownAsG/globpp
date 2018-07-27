@@ -1,31 +1,11 @@
-#include "Glob.hpp"
-#include "Iterator.hpp"
+#include "globpp/Glob.hpp"
+#include "globpp/Iterator.hpp"
+#include "globpp/globpp.hpp"
 
 #include <iostream>
 #include <sstream>
 
 namespace globpp {
-
-#ifdef _MSC_VER
-
-    static const char DIR_SEPC = '\\';
-
-#else
-
-    static const char DIR_SEPC = '/';
-
-#endif
-
-    std::vector<std::string> glob(const std::string& pattern) {
-        std::vector<std::string> paths;
-        Glob g(pattern);
-
-        for (auto& p : g) {
-            paths.push_back(p);
-        }
-
-        return paths;
-    };
 
     Glob::Glob(const std::string& pattern) {
         std::istringstream pattern_stream(pattern);

@@ -1,7 +1,8 @@
 #include "catch.hpp"
 
-#include "Glob.hpp"
 #include "TempFile.hpp"
+#include "globpp/Glob.hpp"
+#include "globpp/globpp.hpp"
 
 #include <iostream>
 

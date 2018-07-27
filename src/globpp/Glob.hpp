@@ -5,8 +5,6 @@
 
 namespace globpp {
 
-    std::vector<std::string> glob(const std::string& pattern);
-
     class Iterator;
 
     class Glob {
