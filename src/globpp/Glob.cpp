@@ -2,7 +2,6 @@
 #include "globpp/Iterator.hpp"
 #include "globpp/globpp.hpp"
 
-#include <iostream>
 #include <sstream>
 
 namespace globpp {
@@ -10,14 +9,18 @@ namespace globpp {
     Glob::Glob(const std::string& pattern) {
         std::istringstream pattern_stream(pattern);
         std::string part;
+
+        bool leading_sep = false;
         while (std::getline(pattern_stream, part, DIR_SEPC)) {
             if (part == "") {
                 // This should only happen if the pattern starts with DIR_SEPC (\/)
                 if (this->_parts.size() == 0) {
                     // if leading with a /, then add that as the start otherwise gets converted to a
                     // relative directory
-                    part = DIR_SEP;
+                    /* part = DIR_SEP; */
+                    leading_sep = true;
                 }
+                continue;
 
                 // XXX: maybe this should be an error..
                 /* if (this->_parts.size() > 0) { */
@@ -25,6 +28,10 @@ namespace globpp {
                 /*     err << "Unexpected double slash or something in `" << pattern << "`"; */
                 /*     throw std::runtime_error(err.str()); */
                 /* } */
+            }
+
+            if (this->_parts.size() == 0 && leading_sep) {
+                part = DIR_SEP + part;
             }
 
             this->_parts.push_back(part);

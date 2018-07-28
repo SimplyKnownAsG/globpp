@@ -71,6 +71,7 @@ TEST_CASE("leading slash", "[slashy]") {
         if (DIRSEP == "/") {
             auto result = globpp::glob(DIRSEP + "bin" + DIRSEP + "ls");
             REQUIRE(1 == result.size());
+            REQUIRE("/bin/ls" == result[0]);
         }
     }
 }
