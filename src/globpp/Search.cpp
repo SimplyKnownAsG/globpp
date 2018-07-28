@@ -39,6 +39,7 @@ namespace globpp {
     }
 
 #else
+
     Search::Search(std::string dir_name, std::string pattern)
             : _dir_name(dir_name)
             , _pattern(pattern)

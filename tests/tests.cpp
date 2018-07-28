@@ -49,10 +49,20 @@ TEST_CASE("files in sub-directory", "[tests]") {
     }
     SECTION("asterisk for folder") {
         TempFile t1({ "dummy" }, "temp-file.extension");
-        auto result = globpp::glob("." + DIRSEP + "*" + DIRSEP + "*.extension");
+        auto result = globpp::glob(globpp::join(".", +"*", +"*.extension"));
         /* print_results(result); */
         REQUIRE(1 == result.size());
         REQUIRE("." + DIRSEP + "dummy" + DIRSEP + "temp-file.extension" == result.at(0));
+    }
+}
+TEST_CASE("directories", "[!mayfail][dirs]") {
+    TempFile dummdir({ "dottydir", "d2" }, "");
+    TempFile t1({ "dottydir", "d2" }, "temp-file.extension");
+
+    SECTION("wildcard folder") {
+        std::cout << globpp::join("dot*", "*", "*.extension") << std::endl;
+        auto result = globpp::glob(globpp::join("dot*", "*", "*.extension"));
+        REQUIRE(1 == result.size());
     }
 }
 
