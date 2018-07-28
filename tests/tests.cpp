@@ -56,6 +56,15 @@ TEST_CASE("files in sub-directory", "[tests]") {
     }
 }
 
+TEST_CASE("leading slash", "[slashy]") {
+    SECTION("explicit folder") {
+        if (DIRSEP == "/") {
+            auto result = globpp::glob(DIRSEP + "bin" + DIRSEP + "ls");
+            REQUIRE(1 == result.size());
+        }
+    }
+}
+
 TEST_CASE("recursion", "[!mayfail][recursion]") {
     SECTION("recursive asterisk works.") {
         TempFile t1({ "dummy" }, "temp-file.extension");
